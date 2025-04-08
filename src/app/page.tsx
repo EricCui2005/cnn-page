@@ -1,5 +1,6 @@
 "use client";
 import "./globals.css";
+import { renderGrayscaleMap } from "@/utils/canvasUtils"; // Import the utility function
 
 import { useState, useEffect } from "react";
 
@@ -8,7 +9,7 @@ export default function Home() {
     Array(10).fill(0)
   ); // Probabilities state for each class (initialized to 0)
   const [imageLoaded, setImageLoaded] = useState(false); // Image loaded state
-  const [featureMap, setFeatureMap] = useState<number[][]>([]); // Feature maps state
+  const [featureMap, setFeatureMap] = useState<number[][][]>([]); // Feature maps state
 
   // Image classes with their probabilities
   const categories = [
@@ -60,11 +61,8 @@ export default function Home() {
       console.log("Feature Maps:", feature_maps);
 
       // Extracting the first feature map
-      const map = feature_maps.feature_maps[0];
-      const firstChannel = map.map((row: number[][]) =>
-        row.map((pixel: number[]) => pixel[10])
-      );
-      setFeatureMap(firstChannel);
+      const maps = feature_maps.feature_maps[0];
+      setFeatureMap(maps);
 
       // Error handling
     } catch (error) {
@@ -74,37 +72,51 @@ export default function Home() {
 
   // Render feature map to canvas
   useEffect(() => {
-    if (featureMap.length > 0) {
-      const canvas = document.getElementById(
-        "featureMapCanvas"
-      ) as HTMLCanvasElement;
-      if (!canvas) return;
+    // Check if featureMap has data and is a 3D array (Height, Width, Depth)
+    if (
+      featureMap &&
+      featureMap.length === 64 && // Check height
+      featureMap[0] &&
+      featureMap[0].length === 64 && // Check width
+      featureMap[0][0] &&
+      Array.isArray(featureMap[0][0]) && // Check depth exists
+      featureMap[0][0].length > 0 && // Check depth has elements
+      typeof featureMap[0][0][0] === "number" // Basic check for number type
+    ) {
+      const height = 64;
+      const width = 64;
+      const depth = featureMap[0][0].length; // Should be 32
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      // Iterate through each of the 32 feature maps (depth dimension)
+      for (let d = 0; d < depth; d++) {
+        const canvas = document.getElementById(
+          `featureMapCanvas-${d}`
+        ) as HTMLCanvasElement;
+        if (!canvas) continue; // Skip if canvas not found
 
-      // Create ImageData
-      const imageData = ctx.createImageData(64, 64);
-      const data = imageData.data;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) continue; // Skip if context cannot be obtained
 
-      // Fill the ImageData with grayscale values from featureMap
-      for (let y = 0; y < 64; y++) {
-        for (let x = 0; x < 64; x++) {
-          const value = featureMap[y][x];
-          // Normalize value to 0-255 range
-          const grayscale = Math.min(255, Math.max(0, Math.floor(value * 255)));
+        // Extract the 2D slice for the current depth map
+        const singleMap: number[][] = Array.from({ length: height }, (_, y) =>
+          Array.from({ length: width }, (_, x) => featureMap[y][x][d])
+        );
 
-          // Set RGBA values (all channels same for grayscale)
-          const index = (y * 64 + x) * 4;
-          data[index] = grayscale; // R
-          data[index + 1] = grayscale; // G
-          data[index + 2] = grayscale; // B
-          data[index + 3] = 255; // A
-        }
+        // Use the utility function to render the map
+        renderGrayscaleMap(ctx, singleMap, width, height);
       }
-
-      // Put the ImageData onto the canvas
-      ctx.putImageData(imageData, 0, 0);
+    } else {
+      // Optional: Clear canvases if featureMap is empty or invalid
+      // Loop through 32 canvases and clear them
+      for (let d = 0; d < 32; d++) {
+        const canvas = document.getElementById(
+          `featureMapCanvas-${d}`
+        ) as HTMLCanvasElement;
+        if (!canvas) continue;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) continue;
+        ctx.clearRect(0, 0, 64, 64);
+      }
     }
   }, [featureMap]);
 
@@ -211,14 +223,21 @@ export default function Home() {
         </div>
 
         {/* Right Panel */}
-        <div className="aspect-square bg-[#1f2937] rounded-lg p-4">
-          <div className="h-full flex items-center justify-center">
-            <canvas
-              id="featureMapCanvas"
-              width="64"
-              height="64"
-              className="w-full h-full"
-            />
+        <div className="aspect-square bg-[#1f2937] rounded-lg p-4 overflow-y-auto">
+          {/* Grid container for feature maps */}
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+            {/* Generate 32 canvas elements */}
+            {Array.from({ length: 32 }).map((_, index) => (
+              <div key={index} className="aspect-square bg-gray-700 rounded">
+                <canvas
+                  id={`featureMapCanvas-${index}`}
+                  width="64"
+                  height="64"
+                  className="w-full h-full object-contain"
+                  title={`Feature Map ${index + 1}`}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
