@@ -1,5 +1,4 @@
 "use client";
-import { useEffect } from "react";
 
 const categories = [
   { name: "Tench", score: 0.8 },
@@ -15,15 +14,34 @@ const categories = [
 ];
 
 export default function Home() {
-  const fetchData = async () => {
-    const response = await fetch("/api/model-summary");
-    const data = await response.json();
-    console.log(data);
-  };
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Create FormData to send the image
+      const formData = new FormData();
+      formData.append("image", file);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+      // Send to our API endpoint
+      const response = await fetch("/api/classify", {
+        method: "POST",
+        body: formData,
+      });
+
+      // Logging response
+      console.log("Response:", response);
+
+      if (!response.ok) {
+        throw new Error("Classification failed");
+      }
+
+      // Logging classification results
+      const result = await response.json();
+      console.log("Classification results:", result);
+
+      // Error handling
+    } catch (error) {
+      console.error("Error during classification:", error);
+    }
+  };
 
   const clearImage = () => {
     const preview = document.getElementById("imagePreview") as HTMLImageElement;
@@ -40,7 +58,7 @@ export default function Home() {
           <div className="aspect-square relative overflow-hidden rounded-lg mb-4 flex-shrink-0">
             <input
               type="file"
-              accept="image/jpeg"
+              accept="image/jpeg,image/png"
               className="hidden"
               id="imageUpload"
               onChange={async (e) => {
@@ -62,6 +80,9 @@ export default function Home() {
                     "imagePreview"
                   ) as HTMLImageElement;
                   if (preview) preview.src = resizedDataUrl;
+
+                  // Send the original file for processing
+                  handleImageUpload(file);
                 };
                 img.src = URL.createObjectURL(file);
               }}
