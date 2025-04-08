@@ -140,7 +140,7 @@ export default function Home() {
 
   return (
     <div className="h-screen bg-[#1a1b26] p-4">
-      <div className="h-full flex justify-center gap-4">
+      <div className="h-full flex gap-4">
         {/* Left Panel */}
         <div className="w-108 bg-[#1f2937] rounded-lg p-4 flex flex-col gap-8">
           <div className="aspect-square relative overflow-hidden rounded-lg mb-4 flex-shrink-0">
@@ -223,7 +223,7 @@ export default function Home() {
         </div>
 
         {/* Right Panel */}
-        <div className="aspect-square bg-[#1f2937] rounded-lg p-4 overflow-y-auto">
+        <div className="aspect-square bg-[#1f2937] w-full rounded-lg p-4 overflow-y-auto">
           {/* Grid container for feature maps */}
           <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
             {/* Generate 32 canvas elements */}

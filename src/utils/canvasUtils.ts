@@ -46,3 +46,20 @@ export function renderGrayscaleMap(
   // Put the ImageData onto the canvas
   ctx.putImageData(imageData, 0, 0);
 }
+
+export function clearImagePreviewAndInput(
+  previewElementId: string,
+  inputElementId: string
+): void {
+  // Clear the image preview
+  const preview = document.getElementById(previewElementId) as HTMLImageElement;
+  if (preview) {
+    preview.src = ""; // Reset the source
+  }
+
+  // Clear the file input value
+  const fileInput = document.getElementById(inputElementId) as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = ""; // Reset the selected file
+  }
+}
