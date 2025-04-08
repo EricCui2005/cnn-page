@@ -85,9 +85,9 @@ export default function Home() {
     ) {
       const height = 64;
       const width = 64;
-      const depth = featureMap[0][0].length; // Should be 32
+      const depth = featureMap[0][0].length; // Should be 35
 
-      // Iterate through each of the 32 feature maps (depth dimension)
+      // Iterate through each of the 35 feature maps (depth dimension)
       for (let d = 0; d < depth; d++) {
         const canvas = document.getElementById(
           `featureMapCanvas-${d}`
@@ -107,8 +107,8 @@ export default function Home() {
       }
     } else {
       // Optional: Clear canvases if featureMap is empty or invalid
-      // Loop through 32 canvases and clear them
-      for (let d = 0; d < 32; d++) {
+      // Loop through 35 canvases and clear them
+      for (let d = 0; d < 35; d++) {
         const canvas = document.getElementById(
           `featureMapCanvas-${d}`
         ) as HTMLCanvasElement;
@@ -225,9 +225,9 @@ export default function Home() {
         {/* Right Panel */}
         <div className="aspect-square bg-[#1f2937] w-full rounded-lg p-4 overflow-y-auto">
           {/* Grid container for feature maps */}
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-            {/* Generate 32 canvas elements */}
-            {Array.from({ length: 32 }).map((_, index) => (
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-2">
+            {/* Generate 35 canvas elements */}
+            {Array.from({ length: 35 }).map((_, index) => (
               <div key={index} className="aspect-square bg-gray-700 rounded">
                 <canvas
                   id={`featureMapCanvas-${index}`}
