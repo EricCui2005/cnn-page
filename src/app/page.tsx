@@ -1,15 +1,14 @@
 "use client";
 import "./globals.css";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  // Initializing 0 probabilities
   const [probabilities, setProbabilities] = useState<number[]>(
     Array(10).fill(0)
-  );
-
-  const [imageLoaded, setImageLoaded] = useState(false);
+  ); // Probabilities state for each class (initialized to 0)
+  const [imageLoaded, setImageLoaded] = useState(false); // Image loaded state
+  const [featureMap, setFeatureMap] = useState<number[][]>([]); // Feature maps state
 
   // Image classes with their probabilities
   const categories = [
@@ -60,11 +59,54 @@ export default function Home() {
       const feature_maps = await feature_maps_response.json();
       console.log("Feature Maps:", feature_maps);
 
+      // Extracting the first feature map
+      const map = feature_maps.feature_maps[0];
+      const firstChannel = map.map((row: number[][]) =>
+        row.map((pixel: number[]) => pixel[10])
+      );
+      setFeatureMap(firstChannel);
+
       // Error handling
     } catch (error) {
       console.error("Error during classification:", error);
     }
   };
+
+  // Render feature map to canvas
+  useEffect(() => {
+    if (featureMap.length > 0) {
+      const canvas = document.getElementById(
+        "featureMapCanvas"
+      ) as HTMLCanvasElement;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Create ImageData
+      const imageData = ctx.createImageData(64, 64);
+      const data = imageData.data;
+
+      // Fill the ImageData with grayscale values from featureMap
+      for (let y = 0; y < 64; y++) {
+        for (let x = 0; x < 64; x++) {
+          const value = featureMap[y][x];
+          // Normalize value to 0-255 range
+          const grayscale = Math.min(255, Math.max(0, Math.floor(value * 255)));
+
+          // Set RGBA values (all channels same for grayscale)
+          const index = (y * 64 + x) * 4;
+          data[index] = grayscale; // R
+          data[index + 1] = grayscale; // G
+          data[index + 2] = grayscale; // B
+          data[index + 3] = 255; // A
+        }
+      }
+
+      // Put the ImageData onto the canvas
+      ctx.putImageData(imageData, 0, 0);
+    }
+  }, [featureMap]);
 
   // Function to clear the loaded image and the preview
   const clearImage = () => {
@@ -170,10 +212,13 @@ export default function Home() {
 
         {/* Right Panel */}
         <div className="aspect-square bg-[#1f2937] rounded-lg p-4">
-          <div className="h-full grid grid-cols-4 gap-4 auto-rows-fr">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="bg-gray-700 rounded-lg w-full h-full" />
-            ))}
+          <div className="h-full flex items-center justify-center">
+            <canvas
+              id="featureMapCanvas"
+              width="64"
+              height="64"
+              className="w-full h-full"
+            />
           </div>
         </div>
       </div>
