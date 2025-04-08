@@ -9,6 +9,8 @@ export default function Home() {
     Array(10).fill(0)
   );
 
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   // Image classes with their probabilities
   const categories = [
     { name: "Tench", score: probabilities[0] },
@@ -29,24 +31,34 @@ export default function Home() {
       const formData = new FormData();
       formData.append("image", file);
 
-      // Send to our API endpoint
-      const response = await fetch("/api/classify", {
+      // Request to classify endpoint
+      const classify_response = await fetch("/api/classify", {
         method: "POST",
         body: formData,
       });
 
-      // Logging response
-      console.log("Response:", response);
+      // Request to feature maps endpoint
+      const feature_maps_response = await fetch("/api/feature-maps", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (!response.ok) {
+      // Error handling
+      if (!classify_response.ok) {
         throw new Error("Classification failed");
       }
+      if (!feature_maps_response.ok) {
+        throw new Error("Feature maps failed");
+      }
 
-      // Logging classification results
-      const result = await response.json();
-      console.log("Classification results:", result.class_probabilities);
-
+      // Logging classification response and setting response probabilities
+      console.log("Classification Response:", classify_response);
+      const result = await classify_response.json();
       setProbabilities(result.class_probabilities);
+
+      console.log("Feature Maps Response:", feature_maps_response);
+      const feature_maps = await feature_maps_response.json();
+      console.log("Feature Maps:", feature_maps);
 
       // Error handling
     } catch (error) {
@@ -68,10 +80,12 @@ export default function Home() {
     if (fileInput) {
       fileInput.value = "";
     }
+
+    setImageLoaded(false);
   };
 
   return (
-    <div className="h-screen bg-background p-4">
+    <div className="h-screen bg-[#1a1b26] p-4">
       <div className="h-full flex justify-center gap-4">
         {/* Left Panel */}
         <div className="w-108 bg-[#1f2937] rounded-lg p-4 flex flex-col gap-8">
@@ -104,6 +118,8 @@ export default function Home() {
                   // Setting the preview image
                   if (preview) preview.src = resizedDataUrl;
 
+                  setImageLoaded(true);
+
                   // Send the original file for processing
                   handleImageUpload(file);
                 };
@@ -130,9 +146,11 @@ export default function Home() {
               >
                 ×
               </button>
-              <div className="absolute inset-0 flex items-center justify-center text-white hover:bg-black/30 transition-colors">
-                Click to upload image
-              </div>
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center text-white hover:bg-black/30 transition-colors">
+                  Click to upload an image
+                </div>
+              )}
             </div>
           </div>
           <div className="space-y-2 overflow-y-auto">

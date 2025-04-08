@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     // Buffer conversion and hitting the model server
     const buffer = await image.arrayBuffer();
-    const response = await fetch("http://127.0.0.1:5000/classify", {
+    const response = await fetch("http://127.0.0.1:5000/feature-maps", {
       method: "POST",
       headers: {
         "Content-Type": "application/octet-stream",
