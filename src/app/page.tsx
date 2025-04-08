@@ -1,4 +1,5 @@
 "use client";
+import "./globals.css";
 
 import { useState } from "react";
 
@@ -70,7 +71,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen bg-[#1a1b26] p-4">
+    <div className="h-screen bg-background p-4">
       <div className="h-full flex justify-center gap-4">
         {/* Left Panel */}
         <div className="w-108 bg-[#1f2937] rounded-lg p-4 flex flex-col gap-8">

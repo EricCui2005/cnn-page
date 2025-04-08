@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+  --background: #1a1b26;
+}
+
 .debug {
   border: 1px solid red;
 }
