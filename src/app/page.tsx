@@ -10,6 +10,7 @@ export default function Home() {
   ); // Probabilities state for each class (initialized to 0)
   const [imageLoaded, setImageLoaded] = useState(false); // Image loaded state
   const [featureMap, setFeatureMap] = useState<number[][][]>([]); // Feature maps state
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null); // State for image preview src
 
   // Image classes with their probabilities
   const categories = [
@@ -122,10 +123,7 @@ export default function Home() {
 
   // Function to clear the loaded image and the preview
   const clearImage = () => {
-    const preview = document.getElementById("imagePreview") as HTMLImageElement;
-    if (preview) {
-      preview.src = "";
-    }
+    setPreviewSrc(null); // Clear the preview src state
 
     // Clear the file input value
     const fileInput = document.getElementById(
@@ -165,12 +163,13 @@ export default function Home() {
                 img.onload = () => {
                   ctx?.drawImage(img, 0, 0, 64, 64);
                   const resizedDataUrl = canvas.toDataURL("image/jpeg");
-                  const preview = document.getElementById(
-                    "imagePreview"
-                  ) as HTMLImageElement;
+                  // const preview = document.getElementById(
+                  //   "imagePreview"
+                  // ) as HTMLImageElement;
 
-                  // Setting the preview image
-                  if (preview) preview.src = resizedDataUrl;
+                  // Setting the preview image using state
+                  // if (preview) preview.src = resizedDataUrl;
+                  setPreviewSrc(resizedDataUrl);
 
                   setImageLoaded(true);
 
@@ -182,15 +181,17 @@ export default function Home() {
             />
             <div
               onClick={() => document.getElementById("imageUpload")?.click()}
-              className="bg-gray-700 w-full h-full cursor-pointer flex items-center justify-center relative"
-              style={{ appearance: "none" }}
+              className="bg-gray-700 w-full h-full cursor-pointer rounded-lg flex items-center justify-center relative focus:outline-none"
             >
-              <img
-                id="imagePreview"
-                className="w-full h-full object-cover"
-                alt=""
-                style={{ appearance: "none" }}
-              />
+              {imageLoaded &&
+                previewSrc && ( // Check for previewSrc as well
+                  <img
+                    id="imagePreview"
+                    className="w-full h-full object-cover rounded-lg"
+                    alt="Image preview" // Add meaningful alt text
+                    src={previewSrc} // Bind src to state
+                  />
+                )}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -201,7 +202,7 @@ export default function Home() {
                 ×
               </button>
               {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center text-white hover:bg-black/30 transition-colors">
+                <div className="absolute inset-0 flex items-center justify-center text-white hover:bg-black/40 transition-colors rounded-lg">
                   Click to upload an image
                 </div>
               )}
