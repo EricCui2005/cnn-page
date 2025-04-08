@@ -3,10 +3,12 @@
 import { useState } from "react";
 
 export default function Home() {
+  // Initializing 0 probabilities
   const [probabilities, setProbabilities] = useState<number[]>(
     Array(10).fill(0)
   );
 
+  // Image classes with their probabilities
   const categories = [
     { name: "Tench", score: probabilities[0] },
     { name: "English Springer", score: probabilities[1] },
@@ -57,6 +59,14 @@ export default function Home() {
     if (preview) {
       preview.src = "";
     }
+
+    // Clear the file input value
+    const fileInput = document.getElementById(
+      "imageUpload"
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   return (
@@ -89,6 +99,8 @@ export default function Home() {
                   const preview = document.getElementById(
                     "imagePreview"
                   ) as HTMLImageElement;
+
+                  // Setting the preview image
                   if (preview) preview.src = resizedDataUrl;
 
                   // Send the original file for processing
