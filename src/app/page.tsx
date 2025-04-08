@@ -1,19 +1,25 @@
 "use client";
 
-const categories = [
-  { name: "Tench", score: 0.8 },
-  { name: "English Springer", score: 0.75 },
-  { name: "Cassette Player", score: 0.7 },
-  { name: "Chainsaw", score: 0.85 },
-  { name: "Church", score: 0.9 },
-  { name: "French Horn", score: 0.82 },
-  { name: "Garbage Truck", score: 0.88 },
-  { name: "Gas Pump", score: 0.95 },
-  { name: "Golf Ball", score: 0.78 },
-  { name: "Parachute", score: 0.86 },
-];
+import { useState } from "react";
 
 export default function Home() {
+  const [probabilities, setProbabilities] = useState<number[]>(
+    Array(10).fill(0)
+  );
+
+  const categories = [
+    { name: "Tench", score: probabilities[0] },
+    { name: "English Springer", score: probabilities[1] },
+    { name: "Cassette Player", score: probabilities[2] },
+    { name: "Chainsaw", score: probabilities[3] },
+    { name: "Church", score: probabilities[4] },
+    { name: "French Horn", score: probabilities[5] },
+    { name: "Garbage Truck", score: probabilities[6] },
+    { name: "Gas Pump", score: probabilities[7] },
+    { name: "Golf Ball", score: probabilities[8] },
+    { name: "Parachute", score: probabilities[9] },
+  ];
+
   const handleImageUpload = async (file: File) => {
     try {
       // Create FormData to send the image
@@ -35,7 +41,9 @@ export default function Home() {
 
       // Logging classification results
       const result = await response.json();
-      console.log("Classification results:", result);
+      console.log("Classification results:", result.class_probabilities);
+
+      setProbabilities(result.class_probabilities);
 
       // Error handling
     } catch (error) {
@@ -43,6 +51,7 @@ export default function Home() {
     }
   };
 
+  // Function to clear the loaded image and the preview
   const clearImage = () => {
     const preview = document.getElementById("imagePreview") as HTMLImageElement;
     if (preview) {
@@ -56,6 +65,7 @@ export default function Home() {
         {/* Left Panel */}
         <div className="w-108 bg-[#1f2937] rounded-lg p-4 flex flex-col gap-8">
           <div className="aspect-square relative overflow-hidden rounded-lg mb-4 flex-shrink-0">
+            {/* Input element to load image, create loaded preview, and make a request to the classification api */}
             <input
               type="file"
               accept="image/jpeg,image/png"
