@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const response = await fetch("http://127.0.0.1:5000/model-summary");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      throw new Error("API URL is not configured");
+    }
+    const response = await fetch(`${apiUrl}/model-summary`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

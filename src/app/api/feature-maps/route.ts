@@ -13,7 +13,11 @@ export async function POST(request: NextRequest) {
 
     // Buffer conversion and hitting the model server
     const buffer = await image.arrayBuffer();
-    const response = await fetch("http://127.0.0.1:5000/feature-maps", {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      throw new Error("API URL is not configured");
+    }
+    const response = await fetch(`${apiUrl}/feature-maps`, {
       method: "POST",
       headers: {
         "Content-Type": "application/octet-stream",
