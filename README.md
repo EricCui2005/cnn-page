@@ -14,7 +14,7 @@ A web application built with Next.js that allows users to upload an image, view 
 - **Framework:** [Next.js](https://nextjs.org/) (React framework)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **API:** Next.js API Routes (handling `/api/classify` and `/api/feature-maps`)
+- **API:** Python Flask API Deployed on an AWS EC2 instance
 
 ## Getting Started
 
