@@ -1,6 +1,7 @@
 "use client";
 import "./globals.css";
 import { renderGrayscaleMap } from "@/utils/canvasUtils"; // Import the utility function
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 
 import { useState, useEffect } from "react";
 
@@ -11,6 +12,8 @@ export default function Home() {
   const [imageLoaded, setImageLoaded] = useState(false); // Image loaded state
   const [featureMap, setFeatureMap] = useState<number[][][]>([]); // Feature maps state
   const [previewSrc, setPreviewSrc] = useState<string | null>(null); // State for image preview src
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Image classes with their probabilities
   const categories = [
@@ -28,6 +31,9 @@ export default function Home() {
 
   const handleImageUpload = async (file: File) => {
     try {
+      setIsLoading(true);
+      setError(null);
+
       // Create FormData to send the image
       const formData = new FormData();
       formData.append("image", file);
@@ -45,29 +51,25 @@ export default function Home() {
       });
 
       // Error handling
-      if (!classify_response.ok) {
-        throw new Error("Classification failed");
-      }
-      if (!feature_maps_response.ok) {
-        throw new Error("Feature maps failed");
+      if (!classify_response.ok || !feature_maps_response.ok) {
+        throw new Error(
+          "Failed to process image. The EC2 instance may be inactive."
+        );
       }
 
       // Logging classification response and setting response probabilities
-      console.log("Classification Response:", classify_response);
       const result = await classify_response.json();
       setProbabilities(result.class_probabilities);
 
-      console.log("Feature Maps Response:", feature_maps_response);
       const feature_maps = await feature_maps_response.json();
-      console.log("Feature Maps:", feature_maps);
-
-      // Extracting the first feature map
       const maps = feature_maps.feature_maps[0];
       setFeatureMap(maps);
-
-      // Error handling
-    } catch (error) {
-      console.error("Error during classification:", error);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,6 +140,7 @@ export default function Home() {
 
   return (
     <div className="h-screen bg-[#1a1b26] p-4">
+      <LoadingOverlay isLoading={isLoading} error={error} />
       <div className="h-full flex gap-4">
         {/* Left Panel */}
         <div className="w-108 bg-[#1f2937] rounded-lg p-4 flex flex-col gap-8">
