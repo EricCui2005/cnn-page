@@ -76,18 +76,3 @@ This frontend interacts with the following backend API endpoints (expected to be
 
 - `POST /api/classify`: Accepts an image file (`multipart/form-data`) and returns JSON with `class_probabilities` (an array of numbers).
 - `POST /api/feature-maps`: Accepts an image file (`multipart/form-data`) and returns JSON with `feature_maps` (expected to be a 3D array, e.g., `[64][64][35]` containing numbers).
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
